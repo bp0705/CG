@@ -248,8 +248,8 @@ void drawHexagonThing()
 	static float baseWidth = 36.0;
 	static float middleWidth = 90.0;
 	static float topWidth = 70.0;
-	static float depth = 200.0;
-	static float height = 50.0;
+	static float depth = 160.0;
+	static float height = 40.0;
 	static float verticalOffset = 18.0;
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -328,7 +328,57 @@ void drawHexagonThing()
 *                           drawHexagonSet                       *
 *****************************************************************/
 //Purpose: Draws a set of three hexagon shapes for the fuselage
-void drawHexagonSet(void)
+void drawHexagonSet(float distance)
+{
+	glPushMatrix();
+		glTranslatef(0.0,0.0,distance);
+		drawHexagonThing();
+		glRotatef(120.0,0.0,0.0,1.0);
+		drawHexagonThing();
+		glRotatef(120.0,0.0,0.0,1.0);
+		drawHexagonThing();
+	glPopMatrix();
+}
+
+/*****************************************************************
+*                          drawSphereThing                       *
+*****************************************************************/
+//Purpose: Draws one of the sphere shapes that goes at the front of the ship
+void drawSphereThing()
+{
+	glPushMatrix();
+		glTranslatef(0.0,70.0,0.0);
+		glRotatef(90.0,1.0,0.0,0.0);
+		gluCylinder(quad, 6.0, 6.0, 45.0, 10, 2);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(0.0,100.0,0.0);
+		gluSphere(quad, 55.0, 20, 10);
+	glPopMatrix();
+	
+}
+
+/*****************************************************************
+*                           drawSphereSet                        *
+*****************************************************************/
+//Purpose: Draws a set of spheres on the end of the ship
+void drawSphereSet(float distance)
+{
+	glPushMatrix();
+		glTranslatef(0.0,0.0,distance);
+		drawSphereThing();
+		glRotatef(60.0,0.0,0.0,1.0);
+		drawSphereThing();
+		glRotatef(60.0,0.0,0.0,1.0);
+		drawSphereThing();
+		glRotatef(60.0,0.0,0.0,1.0);
+		drawSphereThing();
+		glRotatef(60.0,0.0,0.0,1.0);
+		drawSphereThing();
+		glRotatef(60.0,0.0,0.0,1.0);
+		drawSphereThing();
+	glPopMatrix();
+}
 
 /*****************************************************************
 *                          drawThruster                          *
@@ -429,14 +479,23 @@ void drawCentrifuge(void)
 //Purpose: Draws the body of the ship
 void drawFuselage(void)
 {
+	int i;
 	glPushMatrix();
 		glTranslatef(0.0, 0.0, 300.0);
-		gluCylinder(quad, 20.0, 20.0, 1500.0, 30.0, 5.0);
+		gluCylinder(quad, 20.0, 20.0, 1870.0, 30.0, 5.0);
+		glTranslatef(0.0,0.0,1870.0);
+		glutWireCone(20.0, 15.0, 20, 10);
 	glPopMatrix();
 
-	glPushMatrix();
-		
-	glPopMatrix();
+	for(i = 0; i < 6; i++)
+	{
+		drawHexagonSet(300.0 + i*200);
+	}
+	
+	for(i = 0; i < 6; i++)
+	{
+		drawSphereSet(1550+i*115);
+	}
 }
 
 /*****************************************************************
@@ -453,12 +512,9 @@ void drawShip(void)
 		glTranslatef(0.0, -1000.0, 0.0);
 		glRotatef(270.0, 1.0, 0.0, 0.0);
 		
-		drawTrapezoidThing();
-		/*
 		drawThruster();
 		drawFuselage();
 		drawCentrifuge();
-		*/
 	glPopMatrix();
 }
 

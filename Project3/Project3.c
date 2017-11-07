@@ -13,16 +13,20 @@
 #include <stdio.h>
 #include <time.h>
 
+#define CAMERA_DISTANCE 2000
+
 long Timer, ResetTimer;
-float y_rot = 0.0;
-float z_rot = 0.0;
+float y_rot = 347.2;
+float z_rot = 220.0;
 float cam_zoom = 1.0;
 int showHelpMenu = 0;
-int presentationMode = 1;
+int presentationMode = 0;
 int mousePressed = 0;
 int startXPos = 0;
 float startRot = 0.0;
-float currentMouseXPos = 0.0;
+int currentMouseXPos = 0.0;
+
+GLUquadricObj* quad;
 
 /*****************************************************************
 *                               init                             *
@@ -31,8 +35,13 @@ float currentMouseXPos = 0.0;
 void init(void)
 {
 	glClearColor (1.0, 1.0, 1.0, 0.0);
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 
+	quad = gluNewQuadric();
+
+	//******* Set 2nd argument
+	gluQuadricDrawStyle(quad, GLU_LINE);
+	gluQuadricOrientation(quad, GLU_OUTSIDE);
 }
 
 /*****************************************************************
@@ -44,7 +53,7 @@ void reshape(int w, int h)
 	gluLookAt(500.0/cam_zoom, 500.0/cam_zoom, 500.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity ();
-	glOrtho (-1000.0/cam_zoom, 1000.0/cam_zoom, -1000.0/cam_zoom, 1000.0/cam_zoom, -200.0, 3000.0);
+	glOrtho (-1000.0/cam_zoom, 1000.0/cam_zoom, -1000.0/cam_zoom, 1000.0/cam_zoom, -2000.0, 3000.0);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
@@ -231,18 +240,225 @@ void drawAxes(void)
 }
 
 /*****************************************************************
+*                         drawHexagonThing                       *
+*****************************************************************/
+//Purpose: Draws one of the trapezoid shapes that goes along the ship's body
+void drawHexagonThing()
+{
+	static float baseWidth = 36.0;
+	static float middleWidth = 90.0;
+	static float topWidth = 70.0;
+	static float depth = 200.0;
+	static float height = 50.0;
+	static float verticalOffset = 18.0;
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	glColor3f(0.0,0.0,0.0);
+
+	/*
+	
+	      4 ------------ 3
+               /            \
+	    5 /              \ 2
+              \             /	
+	       \           /
+              6  ---------  1
+	*/
+
+	//draw the outer faces
+	glBegin(GL_QUAD_STRIP);
+		//1
+		glVertex3f(baseWidth/2.0,verticalOffset,0.0);
+		glVertex3f(baseWidth/2.0,verticalOffset,depth);
+		//2
+		glVertex3f(middleWidth/2.0,height*.7+verticalOffset,0.0);
+		glVertex3f(middleWidth/2.0,height*.7+verticalOffset,depth);
+		//3
+		glVertex3f(topWidth/2.0,height+verticalOffset,0.0);
+		glVertex3f(topWidth/2.0,height+verticalOffset,depth);
+		//4
+		glVertex3f(-topWidth/2.0,height+verticalOffset,0.0);
+		glVertex3f(-topWidth/2.0,height+verticalOffset,depth);
+		//5
+		glVertex3f(-middleWidth/2.0,height*.7+verticalOffset,0.0);
+		glVertex3f(-middleWidth/2.0,height*.7+verticalOffset,depth);
+		//6
+		glVertex3f(-baseWidth/2.0,verticalOffset,0.0);
+		glVertex3f(-baseWidth/2.0,verticalOffset,depth);
+		//1
+		glVertex3f(baseWidth/2.0,verticalOffset,0.0);
+		glVertex3f(baseWidth/2.0,verticalOffset,depth);
+	glEnd();
+
+	//draw the front face
+	glBegin(GL_POLYGON);
+		//1
+		glVertex3f(baseWidth/2.0,verticalOffset,0.0);
+		//2
+		glVertex3f(middleWidth/2.0,height*.7+verticalOffset,0.0);
+		//3
+		glVertex3f(topWidth/2.0,height+verticalOffset,0.0);
+		//4
+		glVertex3f(-topWidth/2.0,height+verticalOffset,0.0);
+		//5
+		glVertex3f(-middleWidth/2.0,height*.7+verticalOffset,0.0);
+		//6
+		glVertex3f(-baseWidth/2.0,verticalOffset,0.0);
+	glEnd();
+
+	//draw the rear face
+	glBegin(GL_POLYGON);
+		//1
+		glVertex3f(baseWidth/2.0,verticalOffset,depth);
+		//2
+		glVertex3f(middleWidth/2.0,height*.7+verticalOffset,depth);
+		//3
+		glVertex3f(topWidth/2.0,height+verticalOffset,depth);
+		//4
+		glVertex3f(-topWidth/2.0,height+verticalOffset,depth);
+		//5
+		glVertex3f(-middleWidth/2.0,height*.7+verticalOffset,depth);
+		//6
+		glVertex3f(-baseWidth/2.0,verticalOffset,depth);
+	glEnd();
+}
+
+/*****************************************************************
+*                           drawHexagonSet                       *
+*****************************************************************/
+//Purpose: Draws a set of three hexagon shapes for the fuselage
+void drawHexagonSet(void)
+
+/*****************************************************************
+*                          drawThruster                          *
+*****************************************************************/
+//Purpose: Draws the thruster of the ship
+void drawThruster(void)
+{
+	glPushMatrix();
+		gluCylinder(quad, 150.0, 120.0, 80.0, 30.0, 10.0);
+		glPushMatrix();
+			glTranslatef(0.0, 0.0, 80.0);
+			gluCylinder(quad, 120.0, 90.0, 30.0, 30.0, 8.0);
+		glPopMatrix();
+		glPushMatrix();
+			glTranslatef(0.0, 0.0, 110.0);
+			gluCylinder(quad, 90.0, 90.0, 20.0, 30.0, 2.0);
+		glPopMatrix();
+		glPushMatrix();
+			glTranslatef(0.0, 0.0, 130.0);
+			gluCylinder(quad, 90.0, 120.0, 30.0, 30.0, 8.0);
+			glTranslatef(0.0, 0.0, 30.0);
+			glutWireTorus(8.0, 125.0, 6.0, 60.0);
+			gluCylinder(quad, 120.0, 120.0, 90.0, 30.0, 2.0);
+			glTranslatef(0.0, 0.0, 90.0);
+			glutWireTorus(8.0, 125.0, 6.0, 60.0);
+			gluCylinder(quad, 120.0, 20.0, 50.0, 30.0, 10.0);
+		glPopMatrix();
+
+		//the actual engines on the bottom
+		glPushMatrix();
+			glTranslatef(70.0, 0.0, -40.0);
+			gluCylinder(quad, 50.0, 35.0, 50.0, 15.0, 5.0);
+		glPopMatrix();
+		glPushMatrix();
+			glTranslatef(-70.0, 0.0, -40.0);
+			gluCylinder(quad, 50.0, 35.0, 50.0, 15.0, 5.0);
+		glPopMatrix();
+		glPushMatrix();
+			glTranslatef(0.0, 70.0,-40.0);
+			gluCylinder(quad, 50.0, 35.0, 50.0, 15.0, 5.0);
+		glPopMatrix();
+		glPushMatrix();
+			glTranslatef(0.0, -70.0,-40.0);
+			gluCylinder(quad, 50.0, 35.0, 50.0, 15.0, 5.0);
+		glPopMatrix();
+	glPopMatrix();
+}
+
+/*****************************************************************
+*                         drawCentrifuge                         *
+*****************************************************************/
+//Purpose: Draws the centrifugal part of the ship
+void drawCentrifuge(void)
+{
+	//draw the support beams to the centrifuge
+	glPushMatrix();
+		glTranslatef(0.0, 0.0, 205.0);
+		glPushMatrix();
+			glTranslatef(0.0, -110.0, 0.0);
+			glRotatef(90.0, 1.0, 0.0, 0.0);
+			gluCylinder(quad, 20.0, 20.0, 175.0, 30.0, 2.0);
+		glPopMatrix();
+		glPushMatrix();
+			glTranslatef(110.0, 0.0, 0.0);
+			glRotatef(90.0, 0.0, 0.0, 1.0);
+			glRotatef(90.0, 1.0, 0.0, 0.0);
+			gluCylinder(quad, 20.0, 20.0, 175.0, 30.0, 2.0);
+		glPopMatrix();
+		glPushMatrix();
+			glTranslatef(-110.0, 0.0, 0.0);
+			glRotatef(270.0, 0.0, 0.0, 1.0);
+			glRotatef(90.0, 1.0, 0.0, 0.0);
+			gluCylinder(quad, 20.0, 20.0, 175.0, 30.0, 2.0);
+		glPopMatrix();
+		glPushMatrix();
+			glTranslatef(0.0, 110.0, 0.0);
+			glRotatef(180.0, 0.0, 0.0, 1.0);
+			glRotatef(90.0, 1.0, 0.0, 0.0);
+			gluCylinder(quad, 20.0, 20.0, 175.0, 30.0, 2.0);
+		glPopMatrix();
+	glPopMatrix();
+	
+	//draw the centrifuge
+	glPushMatrix();
+		glTranslatef(0.0, 0.0, 205.0);
+		glutWireTorus(45.0, 320.0, 30.0, 60.0);
+		glutWireTorus(5.0, 365.0, 10.0, 60.0);
+		glTranslatef(0.0, 0.0, -45.0);
+		glutWireTorus(5.0, 320.0, 12.0, 60.0);
+		glTranslatef(0.0, 0.0, 90.0);
+		glutWireTorus(5.0, 320.0, 12.0, 60.0);
+	glPopMatrix();
+}
+
+/*****************************************************************
+*                          drawFuselage                          *
+*****************************************************************/
+//Purpose: Draws the body of the ship
+void drawFuselage(void)
+{
+	glPushMatrix();
+		glTranslatef(0.0, 0.0, 300.0);
+		gluCylinder(quad, 20.0, 20.0, 1500.0, 30.0, 5.0);
+	glPopMatrix();
+
+	glPushMatrix();
+		
+	glPopMatrix();
+}
+
+/*****************************************************************
 *                            drawShip                            *
 *****************************************************************/
 //Purpose: Makes calls to draw individual parts of the space ship
 void drawShip(void)
 {
 	glLineWidth(1.0);
-	//**** Call to glut 3D functions go here
 	glColor3f(0.0,0.0,0.0);
 	glPushMatrix();
-		glRotatef(z_rot,0.0,0.0,1.0);
 		glRotatef(y_rot,0.0,1.0,0.0);
-		glutWireTorus(25.0,150.0,30,30);
+		glRotatef(z_rot,0.0,0.0,1.0);
+		glTranslatef(0.0, -1000.0, 0.0);
+		glRotatef(270.0, 1.0, 0.0, 0.0);
+		
+		drawTrapezoidThing();
+		/*
+		drawThruster();
+		drawFuselage();
+		drawCentrifuge();
+		*/
 	glPopMatrix();
 }
 
@@ -255,7 +471,7 @@ void presentation(void)
 	int i;
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity ();
-	glOrtho (-1000.0/cam_zoom, 1000.0/cam_zoom, -1000.0/cam_zoom, 1000.0/cam_zoom, -200.0, 3000.0);
+	glOrtho (-4000.0/cam_zoom, 4000.0/cam_zoom, -4000.0/cam_zoom, 4000.0/cam_zoom, -3000.0, 3000.0);
 	//draw each of the viewports on the screen
 	for(i = 0; i < 4; i++)
 	{
@@ -265,25 +481,25 @@ void presentation(void)
 		{
 			case 0:
 				//top view
-				gluLookAt(1.0, 500.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+				gluLookAt(0.000001, 1000.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 				glViewport(0, 500, 500, 500);
 				break;
 
 			case 1:
 				//isometric/perspective view
-				gluLookAt(500.0/cam_zoom, 500.0/cam_zoom, 500.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+				gluLookAt(1000.0/cam_zoom, 1000.0/cam_zoom, 1000.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 				glViewport(500, 500, 500, 500);
 				break;
 
 			case 2:
 				//front view
-				gluLookAt(0.0, 0.0, 500.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+				gluLookAt(0.0, 0.0, 1000.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 				glViewport(0, 0, 500, 500);
 				break;
 
 			case 3:
 				//right side view
-				gluLookAt(500.0/cam_zoom,0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+				gluLookAt(1000.0/cam_zoom,0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 				glViewport(500, 0, 500, 500);
 				break;
 		}
@@ -301,11 +517,11 @@ void modelingMode(void)
 {
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity ();
-	glOrtho (-1000.0/cam_zoom, 1000.0/cam_zoom, -1000.0/cam_zoom, 1000.0/cam_zoom, -200.0, 3000.0);
+	glOrtho (-4000.0/cam_zoom, 4000.0/cam_zoom, -4000.0/cam_zoom, 4000.0/cam_zoom, -3000.0, 3000.0);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	//isometric/perspective view
-	gluLookAt(500.0/cam_zoom, 500.0/cam_zoom, 500.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	gluLookAt(1000.0/cam_zoom, 1000.0/cam_zoom, 1000.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 	glViewport(0, 0, 1000, 1000);
 	drawAxes();
 	drawShip();
@@ -360,6 +576,8 @@ void idle(void)
 		ResetTimer = ResetTimer + (1.0/60.0) * CLOCKS_PER_SEC;
 				
 		glutPostRedisplay();
+
+		printf("y_rot: %.2f, z_rot: %.2f\n", y_rot, z_rot);
 	}
 
 	if(presentationMode == 0 && mousePressed == 1)
@@ -408,11 +626,10 @@ void display (void)
 int main (int argc, char** argv)
 {
 	glutInit (&argc, argv);
-	glutInitDisplayMode (GLUT_SINGLE|GLUT_RGB);
-	//glutInitDisplayMode (GLUT_SINGLE|GLUT_RGB|GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB);
 	glutInitWindowSize (1000, 1000);
 	glutInitWindowPosition (0, 0);
-	glutCreateWindow (argv[0]);
+	glutCreateWindow(argv[0]);
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(camera_control);
 	glutIdleFunc(idle);

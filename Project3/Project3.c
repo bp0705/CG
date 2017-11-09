@@ -16,8 +16,8 @@
 #define CAMERA_DISTANCE 2000
 
 long Timer, ResetTimer;
-float y_rot = 347.2;
-float z_rot = 220.0;
+float y_rot = 0.0;
+float z_rot = 0.0;
 float cam_zoom = 1.0;
 int showHelpMenu = 0;
 int presentationMode = 0;
@@ -25,6 +25,7 @@ int mousePressed = 0;
 int startXPos = 0;
 float startRot = 0.0;
 int currentMouseXPos = 0.0;
+int showAxes = 1;
 
 GLUquadricObj* quad;
 
@@ -50,10 +51,8 @@ void init(void)
 //Purpose: Reshape the window
 void reshape(int w, int h)
 {
-	gluLookAt(500.0/cam_zoom, 500.0/cam_zoom, 500.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity ();
-	glOrtho (-1000.0/cam_zoom, 1000.0/cam_zoom, -1000.0/cam_zoom, 1000.0/cam_zoom, -2000.0, 3000.0);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
@@ -83,8 +82,18 @@ void mainMenu(int selection)
 		case 4:
 			presentationMode = 0;
 			break;
-
 		case 5:
+			if(showAxes == 0)
+			{
+				showAxes = 1;
+			}
+			else
+			{
+				showAxes = 0;
+			}
+			break;
+
+		case 6:
 			exit(-1);
 			break;
 
@@ -347,11 +356,13 @@ void drawHexagonSet(float distance)
 void drawSphereThing()
 {
 	glPushMatrix();
+		glColor3f(1.0,0.0,0.0);
 		glTranslatef(0.0,70.0,0.0);
 		glRotatef(90.0,1.0,0.0,0.0);
-		gluCylinder(quad, 6.0, 6.0, 45.0, 10, 2);
+		gluCylinder(quad, 6.0, 6.0, 45.0, 15, 2);
 	glPopMatrix();
 	glPushMatrix();
+		glColor3f(0.0,0.0,0.0);
 		glTranslatef(0.0,100.0,0.0);
 		gluSphere(quad, 55.0, 20, 10);
 	glPopMatrix();
@@ -381,11 +392,31 @@ void drawSphereSet(float distance)
 }
 
 /*****************************************************************
+*                         drawSatellite                          *
+*****************************************************************/
+//Purpose: Draws the satellite on the fuselage
+void drawSatellite(void)
+{
+	glPushMatrix();
+		glTranslatef(0.0, 0.0, 980.0);
+		glRotatef(90.0, 1.0, 0.0, 0.0);
+		glPushMatrix();
+			glRotatef(-60.0, 0.0, 1.0, 0.0);
+			glTranslatef(0.0, 0.0, 55.0);
+			gluCylinder(quad, 15.0, 10.0, 90.0, 25, 5);
+			glTranslatef(0.0, 0.0, 90.0);
+			gluCylinder(quad, 20.0, 18.0, 10.0, 4, 1);
+		glPopMatrix();
+	glPopMatrix();
+}
+
+/*****************************************************************
 *                          drawThruster                          *
 *****************************************************************/
 //Purpose: Draws the thruster of the ship
 void drawThruster(void)
 {
+	glColor3f(0.0,0.0,0.0);
 	glPushMatrix();
 		gluCylinder(quad, 150.0, 120.0, 80.0, 30.0, 10.0);
 		glPushMatrix();
@@ -408,6 +439,7 @@ void drawThruster(void)
 		glPopMatrix();
 
 		//the actual engines on the bottom
+		glColor3f(1.0,0.0,1.0);
 		glPushMatrix();
 			glTranslatef(70.0, 0.0, -40.0);
 			gluCylinder(quad, 50.0, 35.0, 50.0, 15.0, 5.0);
@@ -434,6 +466,7 @@ void drawThruster(void)
 void drawCentrifuge(void)
 {
 	//draw the support beams to the centrifuge
+	glColor3f(0.0,1.0,0.0);
 	glPushMatrix();
 		glTranslatef(0.0, 0.0, 205.0);
 		glPushMatrix();
@@ -462,9 +495,11 @@ void drawCentrifuge(void)
 	glPopMatrix();
 	
 	//draw the centrifuge
+	glColor3f(0.0,0.0,1.0);
 	glPushMatrix();
 		glTranslatef(0.0, 0.0, 205.0);
 		glutWireTorus(45.0, 320.0, 30.0, 60.0);
+		glColor3f(0.0,0.0,0.0);
 		glutWireTorus(5.0, 365.0, 10.0, 60.0);
 		glTranslatef(0.0, 0.0, -45.0);
 		glutWireTorus(5.0, 320.0, 12.0, 60.0);
@@ -480,6 +515,7 @@ void drawCentrifuge(void)
 void drawFuselage(void)
 {
 	int i;
+	glColor3f(0.0,1.0,0.0);
 	glPushMatrix();
 		glTranslatef(0.0, 0.0, 300.0);
 		gluCylinder(quad, 20.0, 20.0, 1870.0, 30.0, 5.0);
@@ -511,10 +547,12 @@ void drawShip(void)
 		glRotatef(z_rot,0.0,0.0,1.0);
 		glTranslatef(0.0, -1000.0, 0.0);
 		glRotatef(270.0, 1.0, 0.0, 0.0);
+		glRotatef(-30.0, 0.0, 0.0, 1.0);
 		
 		drawThruster();
 		drawFuselage();
 		drawCentrifuge();
+		drawSatellite();
 	glPopMatrix();
 }
 
@@ -527,7 +565,8 @@ void presentation(void)
 	int i;
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity ();
-	glOrtho (-4000.0/cam_zoom, 4000.0/cam_zoom, -4000.0/cam_zoom, 4000.0/cam_zoom, -3000.0, 3000.0);
+	//glOrtho (-4000.0/cam_zoom, 4000.0/cam_zoom, -4000.0/cam_zoom, 4000.0/cam_zoom, -3000.0, 3000.0);
+	//gluPerspective(100.0,1.0,0.0,6000);
 	//draw each of the viewports on the screen
 	for(i = 0; i < 4; i++)
 	{
@@ -537,30 +576,37 @@ void presentation(void)
 		{
 			case 0:
 				//top view
-				gluLookAt(0.000001, 1000.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+				glOrtho (-4000.0/cam_zoom, 4000.0/cam_zoom, -4000.0/cam_zoom, 4000.0/cam_zoom, -3000.0, 3000.0);
+				gluLookAt(0.000001, 3000.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 				glViewport(0, 500, 500, 500);
 				break;
 
 			case 1:
 				//isometric/perspective view
-				gluLookAt(1000.0/cam_zoom, 1000.0/cam_zoom, 1000.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+				gluPerspective(100.0,1.0,0.0,6000);
+				gluLookAt(3000.0/cam_zoom, 3000.0/cam_zoom, 3000.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 				glViewport(500, 500, 500, 500);
 				break;
 
 			case 2:
 				//front view
-				gluLookAt(0.0, 0.0, 1000.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+				glOrtho (-4000.0/cam_zoom, 4000.0/cam_zoom, -4000.0/cam_zoom, 4000.0/cam_zoom, -3000.0, 3000.0);
+				gluLookAt(0.0, 0.0, 3000.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 				glViewport(0, 0, 500, 500);
 				break;
 
 			case 3:
 				//right side view
-				gluLookAt(1000.0/cam_zoom,0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+				glOrtho (-4000.0/cam_zoom, 4000.0/cam_zoom, -4000.0/cam_zoom, 4000.0/cam_zoom, -3000.0, 3000.0);
+				gluLookAt(3000.0/cam_zoom,0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 				glViewport(500, 0, 500, 500);
 				break;
 		}
 
-		drawAxes();
+		if(showAxes)
+		{
+			drawAxes();
+		}
 		drawShip();
 	}
 }
@@ -573,14 +619,19 @@ void modelingMode(void)
 {
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity ();
-	glOrtho (-4000.0/cam_zoom, 4000.0/cam_zoom, -4000.0/cam_zoom, 4000.0/cam_zoom, -3000.0, 3000.0);
+	//glOrtho(-4000.0/cam_zoom, 4000.0/cam_zoom, -4000.0/cam_zoom, 4000.0/cam_zoom, -3000.0, 3000.0);
+	gluPerspective(100.0,1.0,0.0,6000);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	//isometric/perspective view
-	gluLookAt(1000.0/cam_zoom, 1000.0/cam_zoom, 1000.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	gluLookAt(3000.0/cam_zoom, 3000.0/cam_zoom, 3000.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 	glViewport(0, 0, 1000, 1000);
-	drawAxes();
+	if(showAxes)
+	{
+		drawAxes();
+	}
 	drawShip();
+	//drawSatellite();
 }
 
 /*****************************************************************
@@ -614,7 +665,8 @@ void drawHelpMenu()
 	renderStrokeFontString(-315.0, 50175.0, GLUT_STROKE_MONO_ROMAN, "A and D: Rotate about the Y axis", 2.0, 1.5);
 	renderStrokeFontString(-315.0, 50125.0, GLUT_STROKE_MONO_ROMAN, "W and S: Rotate about the Z axis", 2.0, 1.5);
 	renderStrokeFontString(-230.0, 50000.0, GLUT_STROKE_MONO_ROMAN, "In Modeling mode:", 2.0, 2.0);
-	renderStrokeFontString(-250.0, 49930.0, GLUT_STROKE_MONO_ROMAN, "Click and drag left mouse", 2.0, 1.5);
+	renderStrokeFontString(-330.0, 49930.0, GLUT_STROKE_MONO_ROMAN, "Y axis: Click and drag left mouse", 2.0, 1.5);
+	renderStrokeFontString(-270.0, 49880.0, GLUT_STROKE_MONO_ROMAN, "Controls above work as well", 2.0, 1.5);
 	
 	renderStrokeFontString(-310.0, 49525.0, GLUT_STROKE_MONO_ROMAN, "Click anywhere to close", 2.0, 2.0);
 }
@@ -697,7 +749,8 @@ int main (int argc, char** argv)
 	glutAddMenuEntry("Reset", 2);
 	glutAddMenuEntry("Present", 3);
 	glutAddMenuEntry("Model", 4);
-	glutAddMenuEntry("Exit", 5);
+	glutAddMenuEntry("Toggle Axes", 5);
+	glutAddMenuEntry("Exit", 6);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 	glutDisplayFunc (display);

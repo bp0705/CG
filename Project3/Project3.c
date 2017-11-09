@@ -16,9 +16,9 @@
 #define CAMERA_DISTANCE 2000
 
 long Timer, ResetTimer;
-float y_rot = 0.0;
-float z_rot = 0.0;
-float cam_zoom = 1.0;
+float y_rot = 89.7;
+float z_rot = 260.0;
+float cam_zoom = 12.0;
 int showHelpMenu = 0;
 int presentationMode = 0;
 int mousePressed = 0;
@@ -127,14 +127,14 @@ void mouse (int button, int state, GLint x, GLint y)
 		mousePressed = 0;
 	}
 
-	if(button == 3 && cam_zoom < 8)
+	if(button == 3 && cam_zoom < 16)
 	{
-		cam_zoom++;
+		cam_zoom += .1;
 	}
 
 	if(button == 4 && cam_zoom > 1)
 	{
-		cam_zoom--;
+		cam_zoom -= .1;
 	}
 }
 
@@ -397,15 +397,50 @@ void drawSphereSet(float distance)
 //Purpose: Draws the satellite on the fuselage
 void drawSatellite(void)
 {
+	glColor3f(1.0, 0.4, 0.0);
 	glPushMatrix();
 		glTranslatef(0.0, 0.0, 980.0);
 		glRotatef(90.0, 1.0, 0.0, 0.0);
 		glPushMatrix();
 			glRotatef(-60.0, 0.0, 1.0, 0.0);
 			glTranslatef(0.0, 0.0, 55.0);
-			gluCylinder(quad, 15.0, 10.0, 90.0, 25, 5);
-			glTranslatef(0.0, 0.0, 90.0);
-			gluCylinder(quad, 20.0, 18.0, 10.0, 4, 1);
+			gluCylinder(quad, 15.0, 12.0, 30.0, 25, 5);
+			glTranslatef(0.0, 0.0, 30.0);
+			gluCylinder(quad, 12.0, 8.0, 20.0, 25, 5);
+			glTranslatef(0.0, 0.0, 20.0);
+			gluCylinder(quad, 8.0, 12.0, 5.0, 15, 5);
+			glTranslatef(0.0, 0.0, 5.0);
+			glColor3f(0.0, 0.0, 0.0);
+			gluCylinder(quad, 20.0, 18.0, 8.0, 4, 1);
+			glPushMatrix();
+				glColor3f(1.0, 0.4, 0.0);
+				glTranslatef(0.0, 0.0, 10.0);
+				gluCylinder(quad, 3.0, 3.0, 20.0, 20.0, 3);
+				glTranslatef(0.0, 0.0, 20.0);
+				glRotatef(120.0, 0.0, 0.0, 1.0);
+				glPushMatrix();
+					glutWireCube(5.0);
+					glRotatef(30.0, 1.0, 0.0, 0.0);
+					gluCylinder(quad, 3.0, 3.0, 10.0, 20.0, 3);
+					glTranslatef(0.0, 0.0, 10.0);
+					glutWireCube(5.0);
+					glRotatef(50.0, 1.0, 0.3, 0.0);
+						glColor3f(0.0, 0.0, 0.0);
+						//the cylinder in the middle of the dish
+						glTranslatef(0.0, 0.0, -5.0);
+						gluCylinder(quad, 15.0, 15.0, 10.0, 30, 5);
+						glTranslatef(0.0, 0.0, 5.0);
+					glColor3f(1.0, 0.4, 0.0);
+					gluCylinder(quad, 0, 50.0, 5.0, 30, 10);
+					glTranslatef(0.0, 0.0, 5.0);
+					gluCylinder(quad, 50.0, 75.0, 7.0, 30, 10);
+					glTranslatef(0.0, 0.0, 7.0);
+					gluCylinder(quad, 75.0, 85, 8.0, 30, 8);
+					glColor3f(0.0, 0.0, 0.0);
+					glTranslatef(0.0, 0.0, 8.0);
+					gluCylinder(quad, 85.0, 86.0, 4.0, 30, 5);
+				glPopMatrix();
+			glPopMatrix();
 		glPopMatrix();
 	glPopMatrix();
 }
@@ -664,9 +699,10 @@ void drawHelpMenu()
 	renderStrokeFontString(-275.0, 50250.0, GLUT_STROKE_MONO_ROMAN, "In Presentation mode:", 2.0, 2.0);
 	renderStrokeFontString(-315.0, 50175.0, GLUT_STROKE_MONO_ROMAN, "A and D: Rotate about the Y axis", 2.0, 1.5);
 	renderStrokeFontString(-315.0, 50125.0, GLUT_STROKE_MONO_ROMAN, "W and S: Rotate about the Z axis", 2.0, 1.5);
-	renderStrokeFontString(-230.0, 50000.0, GLUT_STROKE_MONO_ROMAN, "In Modeling mode:", 2.0, 2.0);
-	renderStrokeFontString(-330.0, 49930.0, GLUT_STROKE_MONO_ROMAN, "Y axis: Click and drag left mouse", 2.0, 1.5);
-	renderStrokeFontString(-270.0, 49880.0, GLUT_STROKE_MONO_ROMAN, "Controls above work as well", 2.0, 1.5);
+	renderStrokeFontString(-330.0, 50075.0, GLUT_STROKE_MONO_ROMAN, "Numbers 1-8 and mouse wheel: Zoom", 2.0, 1.5);
+	renderStrokeFontString(-230.0, 49900.0, GLUT_STROKE_MONO_ROMAN, "In Modeling mode:", 2.0, 2.0);
+	renderStrokeFontString(-330.0, 49830.0, GLUT_STROKE_MONO_ROMAN, "Y axis: Click and drag left mouse", 2.0, 1.5);
+	renderStrokeFontString(-270.0, 49780.0, GLUT_STROKE_MONO_ROMAN, "Controls above work as well", 2.0, 1.5);
 	
 	renderStrokeFontString(-310.0, 49525.0, GLUT_STROKE_MONO_ROMAN, "Click anywhere to close", 2.0, 2.0);
 }

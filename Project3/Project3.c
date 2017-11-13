@@ -7,8 +7,6 @@
 *                                                              *
 ****************************************************************/
 
-/* Skeleton for displaying glut 3D primitives */
-
 #include <GL/glut.h>
 #include <stdio.h>
 #include <time.h>
@@ -16,11 +14,11 @@
 #define CAMERA_DISTANCE 2000
 
 long Timer, ResetTimer;
-float y_rot = 89.7;
-float z_rot = 260.0;
-float cam_zoom = 12.0;
+float y_rot = 0.0;
+float z_rot = 0.0;
+float cam_zoom = 2.0;
 int showHelpMenu = 0;
-int presentationMode = 0;
+int presentationMode = 1;
 int mousePressed = 0;
 int startXPos = 0;
 float startRot = 0.0;
@@ -40,7 +38,6 @@ void init(void)
 
 	quad = gluNewQuadric();
 
-	//******* Set 2nd argument
 	gluQuadricDrawStyle(quad, GLU_LINE);
 	gluQuadricOrientation(quad, GLU_OUTSIDE);
 }

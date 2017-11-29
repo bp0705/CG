@@ -24,7 +24,7 @@ int currentMouseXPos = 0.0;
 int theSunLight = 1;
 int satelliteLight = 1;
 int ringLights = 1;
-int spotLight = 1;
+int spotLight = 0;
 
 GLfloat brass[3][4] = {{.329412, .223529, .027451, 1.0}, {.780392, .568627, .113725, 1.0}, {.992157, .941176, .807843, 1.0}};
 GLfloat steel[3][4] = {{0.1, 0.1, 0.1, 1.0}, {.55, .55, .55, 1.0}, {.85, .85, .85, 1.0}};
@@ -91,16 +91,14 @@ void init(void)
 	glLightfv(GL_LIGHT4, GL_AMBIENT, ambCol1);
 	glLightfv(GL_LIGHT4, GL_DIFFUSE, diffCol1);
 	glLightfv(GL_LIGHT4, GL_SPECULAR, specCol1);
-	glLightfv(GL_LIGHT4, GL_POSITION, spotPos);
-	glLightfv(GL_LIGHT4, GL_SPOT_DIRECTION, spotDirection);
-	glLightf(GL_LIGHT4, GL_SPOT_CUTOFF, 2.0);
-	glLightf(GL_LIGHT4, GL_SPOT_EXPONENT, 15.0);
+	glLightf(GL_LIGHT4, GL_SPOT_CUTOFF, 5.0);
+	glLightf(GL_LIGHT4, GL_SPOT_EXPONENT, 100.0);
 
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHT1);
 	glEnable(GL_LIGHT2);
 	glEnable(GL_LIGHT3);
-	glEnable(GL_LIGHT4);
+	//glEnable(GL_LIGHT4);
 
 	quad = gluNewQuadric();
 	gluQuadricDrawStyle(quad, GLU_FILL);
@@ -133,6 +131,19 @@ void mainMenu(int selection)
 			y_rot = 0.0;
 			z_rot = 0.0;
 			cam_zoom = 1.0;
+			spotDirection[0] = -1.0;
+			spotDirection[1] = -1.0;
+			spotDirection[2] = -1.0;
+			glEnable(GL_LIGHT0);
+			glEnable(GL_LIGHT1);
+			glEnable(GL_LIGHT2);
+			glEnable(GL_LIGHT3);
+			glDisable(GL_LIGHT4);
+			theSunLight = 1;
+			satelliteLight = 1;
+			ringLights = 1;
+			spotLight = 0;
+			glClearColor (28.0/255.0, 114.0/255.0, 223.0/255.0, 0.0);
 			break;
 
 		case 3:
@@ -301,27 +312,27 @@ void camera_control(unsigned char key, int x, int y)
 
 	if(key == 'j')
 	{
-		spotDirection[0]-=.01;
-		spotDirection[2]+=.01;
+		spotDirection[0]-=.05/cam_zoom;
+		spotDirection[2]+=.05/cam_zoom;
 		glLightfv(GL_LIGHT3, GL_SPOT_DIRECTION, spotDirection);
 	}
 
 	if(key == 'l')
 	{
-		spotDirection[0]+=.01;
-		spotDirection[2]-=.01;
+		spotDirection[0]+=.05/cam_zoom;
+		spotDirection[2]-=.05/cam_zoom;
 		glLightfv(GL_LIGHT3, GL_SPOT_DIRECTION, spotDirection);
 	}
 
 	if(key == 'k')
 	{
-		spotDirection[1]-=.01;
+		spotDirection[1]-=.05/cam_zoom;
 		glLightfv(GL_LIGHT3, GL_SPOT_DIRECTION, spotDirection);
 	}
 
 	if(key == 'i')
 	{
-		spotDirection[1]+=.01;
+		spotDirection[1]+=.05/cam_zoom;
 		glLightfv(GL_LIGHT3, GL_SPOT_DIRECTION, spotDirection);
 	}
 
@@ -720,25 +731,25 @@ void drawCentrifuge(void)
 		glPushMatrix();
 			glTranslatef(0.0, -110.0, 0.0);
 			glRotatef(90.0, 1.0, 0.0, 0.0);
-			gluCylinder(quad, 20.0, 20.0, 175.0, 30.0, 2.0);
+			gluCylinder(quad, 20.0, 20.0, 175.0, 30.0, 20.0);
 		glPopMatrix();
 		glPushMatrix();
 			glTranslatef(110.0, 0.0, 0.0);
 			glRotatef(90.0, 0.0, 0.0, 1.0);
 			glRotatef(90.0, 1.0, 0.0, 0.0);
-			gluCylinder(quad, 20.0, 20.0, 175.0, 30.0, 2.0);
+			gluCylinder(quad, 20.0, 20.0, 175.0, 30.0, 20.0);
 		glPopMatrix();
 		glPushMatrix();
 			glTranslatef(-110.0, 0.0, 0.0);
 			glRotatef(270.0, 0.0, 0.0, 1.0);
 			glRotatef(90.0, 1.0, 0.0, 0.0);
-			gluCylinder(quad, 20.0, 20.0, 175.0, 30.0, 2.0);
+			gluCylinder(quad, 20.0, 20.0, 175.0, 30.0, 20.0);
 		glPopMatrix();
 		glPushMatrix();
 			glTranslatef(0.0, 110.0, 0.0);
 			glRotatef(180.0, 0.0, 0.0, 1.0);
 			glRotatef(90.0, 1.0, 0.0, 0.0);
-			gluCylinder(quad, 20.0, 20.0, 175.0, 30.0, 2.0);
+			gluCylinder(quad, 20.0, 20.0, 175.0, 30.0, 20.0);
 		glPopMatrix();
 	glPopMatrix();
 	
@@ -778,7 +789,7 @@ void drawFuselage(void)
 	glColor3f(0.0,1.0,0.0);
 	glPushMatrix();
 		glTranslatef(0.0, 0.0, 300.0);
-		gluCylinder(quad, 20.0, 20.0, 1870.0, 30.0, 5.0);
+		gluCylinder(quad, 20.0, 20.0, 1870.0, 30.0, 100.0);
 		glTranslatef(0.0,0.0,1870.0);
 		glutSolidCone(20.0, 15.0, 20, 10);
 	glPopMatrix();
@@ -858,6 +869,7 @@ void modelingMode(void)
 	gluLookAt(3000.0/cam_zoom, 3000.0/cam_zoom, 3000.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 	glLightfv(GL_LIGHT0, GL_POSITION, theSunPos);
 	glLightfv(GL_LIGHT4, GL_POSITION, spotPos);
+	glLightfv(GL_LIGHT4, GL_SPOT_DIRECTION, spotDirection);
 	glViewport(0, 0, 1000, 1000);
 
 	drawShip();

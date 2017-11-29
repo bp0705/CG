@@ -21,12 +21,24 @@ int mousePressed = 0;
 int startXPos = 0;
 float startRot = 0.0;
 int currentMouseXPos = 0.0;
+int theSunLight = 1;
+int satelliteLight = 1;
+int ringLights = 1;
+int spotLight = 1;
 
 GLfloat brass[3][4] = {{.329412, .223529, .027451, 1.0}, {.780392, .568627, .113725, 1.0}, {.992157, .941176, .807843, 1.0}};
-GLfloat steel[3][4] = {{0.0, 0.0, 0.0, 1.0}, {.55, .55, .55, 1.0}, {.85, .85, .85, 1.0}};
-GLfloat chrome[3][4] = {{0.0, 0.0, 0.0, 1.0}, {.90, .90, .90, 1.0}, {.95, .95, .95, 1.0}};
+GLfloat steel[3][4] = {{0.1, 0.1, 0.1, 1.0}, {.55, .55, .55, 1.0}, {.85, .85, .85, 1.0}};
+GLfloat chrome[3][4] = {{0.25, 0.25, 0.25, 1.0}, {.90, .90, .90, 1.0}, {.95, .95, .95, 1.0}};
 GLfloat obsidian[3][4] = {{.05375, 0.05, 0.06625, 0.82}, {.18275, .17, .22525, 0.82}, {.332741, .328634, .346435, 0.82}};
+GLfloat gold[3][4] = {{0.24725, 0.19995, 0.0745, 1.0}, {.75164, .60648, .22648, 1.0}, {.628281, .555802, .366065, 1.0}};
+GLfloat glass[3][4] = {{1.0, 1.0, 1.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, {1.0, 1.0, 1.0, 1.0}};
 GLfloat blackColor[] = {0.0, 0.0, 0.0, 1.0};
+
+GLfloat satellitePos[] = {-130, -60.0, 965.0, 1.0};
+GLfloat ringLightPos1[] = {-270.0, -120.0, 155.0, 1.0};
+GLfloat ringLightPos2[] = {-170.0, -240.0, 155.0, 1.0};
+GLfloat spotPos[] = {1000.0, 1000.0, 1000.0, 1.0};
+GLfloat spotDirection[] = {-1.0, -1.0, -1.0};
 
 GLUquadricObj* quad;
 
@@ -36,12 +48,16 @@ GLUquadricObj* quad;
 //Purpose: Initializes clear color and other options, including light
 void init(void)
 {
-	glClearColor (0.0, 0.0, 0.0, 0.0);
+	glClearColor (28.0/255.0, 114.0/255.0, 223.0/255.0, 0.0);
 
-	GLfloat ambCol[] = {0.0, 0.0, 0.0, 1.0};
-	GLfloat diffCol[] = {1.0, 1.0, 1.0, 1.0};
-	GLfloat specCol[] = {1.0, 1.0, 1.0, 1.0};
-	GLfloat amb[] = {0.5, 0.5, 0.5, 1.0};
+	GLfloat ambCol1[] = {0.0, 0.0, 0.0, 1.0};
+	GLfloat diffCol1[] = {1.0, 1.0, 1.0, 1.0};
+	GLfloat specCol1[] = {1.0, 1.0, 1.0, 1.0};
+
+	GLfloat diffCol2[] = {0.2, 0.2, 0.2, 1.0};
+	GLfloat specCol2[] = {0.2, 0.2, 0.2, 1.0};
+
+	GLfloat amb[] = {0.3, 0.3, 0.3, 1.0};
 
 	glShadeModel(GL_SMOOTH);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH);
@@ -53,11 +69,38 @@ void init(void)
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb);
 	glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
-	glLightfv(GL_LIGHT0, GL_AMBIENT, ambCol);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffCol);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, specCol);	
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambCol1);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffCol1);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specCol1);
+
+	glLightfv(GL_LIGHT1, GL_AMBIENT, ambCol1);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffCol2);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, specCol2);
+	glLightfv(GL_LIGHT1, GL_POSITION, satellitePos);
+
+	glLightfv(GL_LIGHT2, GL_AMBIENT, ambCol1);
+	glLightfv(GL_LIGHT2, GL_DIFFUSE, diffCol2);
+	glLightfv(GL_LIGHT2, GL_SPECULAR, specCol2);
+	glLightfv(GL_LIGHT2, GL_POSITION, ringLightPos1);
+
+	glLightfv(GL_LIGHT3, GL_AMBIENT, ambCol1);
+	glLightfv(GL_LIGHT3, GL_DIFFUSE, diffCol2);
+	glLightfv(GL_LIGHT3, GL_SPECULAR, specCol2);
+	glLightfv(GL_LIGHT3, GL_POSITION, ringLightPos2);
+
+	glLightfv(GL_LIGHT4, GL_AMBIENT, ambCol1);
+	glLightfv(GL_LIGHT4, GL_DIFFUSE, diffCol1);
+	glLightfv(GL_LIGHT4, GL_SPECULAR, specCol1);
+	glLightfv(GL_LIGHT4, GL_POSITION, spotPos);
+	glLightfv(GL_LIGHT4, GL_SPOT_DIRECTION, spotDirection);
+	glLightf(GL_LIGHT4, GL_SPOT_CUTOFF, 2.0);
+	glLightf(GL_LIGHT4, GL_SPOT_EXPONENT, 15.0);
 
 	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
+	glEnable(GL_LIGHT2);
+	glEnable(GL_LIGHT3);
+	glEnable(GL_LIGHT4);
 
 	quad = gluNewQuadric();
 	gluQuadricDrawStyle(quad, GLU_FILL);
@@ -92,8 +135,79 @@ void mainMenu(int selection)
 			cam_zoom = 1.0;
 			break;
 
-		case 2:
+		case 3:
 			exit(-1);
+			break;
+
+		default:
+			break;
+	}
+
+	glutPostRedisplay();
+}
+
+/*****************************************************************
+*                          LightOptions                          *
+*****************************************************************/
+//Purpose: Allows toggling of lights
+void LightOptions(int selection)
+{
+	switch(selection)
+	{
+		case 1:
+			if(theSunLight == 0)
+			{
+				theSunLight = 1;
+				glClearColor (28.0/255.0, 114.0/255.0, 223.0/255.0, 0.0);
+				glEnable(GL_LIGHT0);
+			}
+			else
+			{
+				theSunLight = 0;
+				glClearColor (0.0, 0.0, 0.0, 0.0);
+				glDisable(GL_LIGHT0);
+			}
+			break;
+
+		case 2:
+			if(satelliteLight == 0)
+			{
+				satelliteLight = 1;
+				glEnable(GL_LIGHT1);
+			}
+			else
+			{
+				satelliteLight = 0;
+				glDisable(GL_LIGHT1);
+			}
+			break;
+
+		case 3:
+			if(ringLights == 0)
+			{
+				ringLights = 1;
+				glEnable(GL_LIGHT2);
+				glEnable(GL_LIGHT3);
+			}
+			else
+			{
+				ringLights = 0;
+				glDisable(GL_LIGHT2);
+				glDisable(GL_LIGHT3);
+			}
+			break;
+
+		case 4:
+			if(spotLight == 0)
+			{
+				spotLight = 1;
+				glEnable(GL_LIGHT4);
+			}
+			else
+			{
+				spotLight = 0;
+				glDisable(GL_LIGHT4);
+			}
 			break;
 
 		default:
@@ -185,6 +299,32 @@ void camera_control(unsigned char key, int x, int y)
 		}
 	}
 
+	if(key == 'j')
+	{
+		spotDirection[0]-=.01;
+		spotDirection[2]+=.01;
+		glLightfv(GL_LIGHT3, GL_SPOT_DIRECTION, spotDirection);
+	}
+
+	if(key == 'l')
+	{
+		spotDirection[0]+=.01;
+		spotDirection[2]-=.01;
+		glLightfv(GL_LIGHT3, GL_SPOT_DIRECTION, spotDirection);
+	}
+
+	if(key == 'k')
+	{
+		spotDirection[1]-=.01;
+		glLightfv(GL_LIGHT3, GL_SPOT_DIRECTION, spotDirection);
+	}
+
+	if(key == 'i')
+	{
+		spotDirection[1]+=.01;
+		glLightfv(GL_LIGHT3, GL_SPOT_DIRECTION, spotDirection);
+	}
+
 	if(key >= '1' && key <= '8')
 	{
 		cam_zoom = (float)key - 48.0;
@@ -227,10 +367,10 @@ void drawHexagonThing()
 	static float verticalOffset = 18.0;
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, steel[0]);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, steel[1]);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, steel[2]);
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 32.0);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, chrome[0]);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, chrome[1]);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, chrome[2]);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 80.0);
 
 	glColor3f(0.0,0.0,0.0);
 
@@ -350,16 +490,22 @@ void drawHexagonSet(float distance)
 //Purpose: Draws one of the sphere shapes that goes at the front of the ship
 void drawSphereThing()
 {
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, obsidian[0]);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, obsidian[1]);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, obsidian[2]);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 38.4);
 	glPushMatrix();
-		glColor3f(1.0,0.0,0.0);
 		glTranslatef(0.0,70.0,0.0);
 		glRotatef(90.0,1.0,0.0,0.0);
-		gluCylinder(quad, 6.0, 6.0, 45.0, 15, 2);
+		gluCylinder(quad, 6.0, 6.0, 100.0, 15, 2);
 	glPopMatrix();
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, steel[0]);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, steel[1]);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, steel[2]);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 32.0);
 	glPushMatrix();
-		glColor3f(0.0,0.0,0.0);
 		glTranslatef(0.0,100.0,0.0);
-		gluSphere(quad, 55.0, 60, 60);
+		gluSphere(quad, 50.0, 60, 60);
 	glPopMatrix();
 	
 }
@@ -392,7 +538,10 @@ void drawSphereSet(float distance)
 //Purpose: Draws the satellite on the fuselage
 void drawSatellite(void)
 {
-	glColor3f(1.0, 0.4, 0.0);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, steel[0]);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, steel[1]);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, steel[2]);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 32.0);
 	glPushMatrix();
 		glTranslatef(0.0, 0.0, 980.0);
 		glRotatef(90.0, 1.0, 0.0, 0.0);
@@ -407,22 +556,32 @@ void drawSatellite(void)
 			glTranslatef(0.0, 0.0, 5.0);
 			glColor3f(0.0, 0.0, 0.0);
 			gluCylinder(quad, 20.0, 18.0, 8.0, 4, 1);
+			glutSolidCone(20.0, .001, 4, 1);
+			glTranslatef(0.0, 0.0, 8.0);
+			glutSolidCone(18.0, .001, 4, 1);
+			glTranslatef(0.0, 0.0, -12.0);
 			glPushMatrix();
 				glColor3f(1.0, 0.4, 0.0);
 				glTranslatef(0.0, 0.0, 10.0);
 				gluCylinder(quad, 3.0, 3.0, 20.0, 20.0, 3);
 				glTranslatef(0.0, 0.0, 20.0);
-				glRotatef(120.0, 0.0, 0.0, 1.0);
+				glRotatef(123.0, 0.0, 0.0, 1.0);
 				glPushMatrix();
-					glutWireCube(5.0);
+					glutSolidCube(8.0);
 					glRotatef(30.0, 1.0, 0.0, 0.0);
 					gluCylinder(quad, 3.0, 3.0, 10.0, 20.0, 3);
 					glTranslatef(0.0, 0.0, 10.0);
-					glutWireCube(5.0);
+					glutSolidCube(5.0);
 					glRotatef(50.0, 1.0, 0.3, 0.0);
 						glColor3f(0.0, 0.0, 0.0);
 						//the cylinder in the middle of the dish
 						glTranslatef(0.0, 0.0, -5.0);
+						glPushMatrix();
+							glTranslatef(0.0,0.0,10.0);
+							glutSolidCone(15.0, .001, 20, 1);
+							glTranslatef(0.0,0.0,-10.0);
+							glutSolidCone(15.0, .001, 20, 1);
+						glPopMatrix();
 						gluCylinder(quad, 15.0, 15.0, 10.0, 30, 5);
 						glTranslatef(0.0, 0.0, 5.0);
 					glColor3f(1.0, 0.4, 0.0);
@@ -469,7 +628,7 @@ void drawThruster(void)
 			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, chrome[0]);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, chrome[1]);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, chrome[2]);
-			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 32.0);
+			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 80.0);
 			glTranslatef(0.0, 0.0, 110.0);
 			gluCylinder(quad, 90.0, 90.0, 20.0, 30.0, 2.0);
 		glPopMatrix();
@@ -485,15 +644,17 @@ void drawThruster(void)
 			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, chrome[0]);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, chrome[1]);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, chrome[2]);
-			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 32.0);
+			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 80.0);
 			gluCylinder(quad, 120.0, 120.0, 90.0, 30.0, 2.0);
 			glTranslatef(0.0, 0.0, 90.0);
 			glutSolidTorus(8.0, 125.0, 6.0, 60.0);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, chrome[0]);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, chrome[1]);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, chrome[2]);
-			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 32.0);
 			gluCylinder(quad, 120.0, 20.0, 50.0, 30.0, 10.0);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, gold[0]);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, gold[1]);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, gold[2]);
+			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 51.2);
+			glTranslatef(0.0, 0.0, -20.0);
+			gluCylinder(quad, 121.0, 121.0, 20.0, 30.0, 8.0);
 		glPopMatrix();
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -582,16 +743,22 @@ void drawCentrifuge(void)
 	glPopMatrix();
 	
 	//draw the centrifuge
-	glColor3f(0.0,0.0,1.0);
 	glPushMatrix();
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, chrome[0]);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, chrome[1]);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, chrome[2]);
+		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 80.0);
 		glTranslatef(0.0, 0.0, 205.0);
-		glutWireTorus(45.0, 320.0, 30.0, 60.0);
-		glColor3f(0.0,0.0,0.0);
-		glutWireTorus(5.0, 365.0, 10.0, 60.0);
+		glutSolidTorus(45.0, 320.0, 30.0, 60.0);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, obsidian[0]);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, obsidian[1]);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, obsidian[2]);
+		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 38.4);
+		glutSolidTorus(5.0, 365.0, 10.0, 60.0);
 		glTranslatef(0.0, 0.0, -45.0);
-		glutWireTorus(5.0, 320.0, 12.0, 60.0);
+		glutSolidTorus(5.0, 320.0, 12.0, 60.0);
 		glTranslatef(0.0, 0.0, 90.0);
-		glutWireTorus(5.0, 320.0, 12.0, 60.0);
+		glutSolidTorus(5.0, 320.0, 12.0, 60.0);
 	glPopMatrix();
 }
 
@@ -613,7 +780,7 @@ void drawFuselage(void)
 		glTranslatef(0.0, 0.0, 300.0);
 		gluCylinder(quad, 20.0, 20.0, 1870.0, 30.0, 5.0);
 		glTranslatef(0.0,0.0,1870.0);
-		glutWireCone(20.0, 15.0, 20, 10);
+		glutSolidCone(20.0, 15.0, 20, 10);
 	glPopMatrix();
 
 	for(i = 0; i < 6; i++)
@@ -634,13 +801,38 @@ void drawFuselage(void)
 void drawShip(void)
 {
 	glLineWidth(1.0);
-	glColor3f(0.0,0.0,0.0);
+	glColor3f(1.0,1.0,1.0);
 	glPushMatrix();
 		glRotatef(y_rot,0.0,1.0,0.0);
 		glRotatef(z_rot,0.0,0.0,1.0);
 		glTranslatef(0.0, -1000.0, 0.0);
 		glRotatef(270.0, 1.0, 0.0, 0.0);
 		glRotatef(-30.0, 0.0, 0.0, 1.0);
+		glLightfv(GL_LIGHT1, GL_POSITION, satellitePos);
+		glLightfv(GL_LIGHT2, GL_POSITION, ringLightPos1);
+		glLightfv(GL_LIGHT3, GL_POSITION, ringLightPos2);
+
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glass[0]);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glass[1]);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, glass[2]);
+		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 80.0);
+
+		//position the satellite light
+		glPushMatrix();
+			glTranslatef(satellitePos[0], satellitePos[1], satellitePos[2]);
+		glPopMatrix();
+
+		//position the first ring light
+		glPushMatrix();
+			glTranslatef(ringLightPos1[0], ringLightPos1[1], ringLightPos1[2]+15.0);
+			glutSolidSphere(5.0, 20, 20);
+		glPopMatrix();
+
+		//position the second ring light
+		glPushMatrix();
+			glTranslatef(ringLightPos2[0], ringLightPos2[1], ringLightPos2[2]+15.0);
+			glutSolidSphere(5.0, 20, 20);
+		glPopMatrix();
 		
 		drawThruster();
 		drawFuselage();
@@ -655,6 +847,8 @@ void drawShip(void)
 //Purpose: Draws the scene in modeling mode to make it easier to build the ship
 void modelingMode(void)
 {
+	GLfloat theSunPos[] = {0.0, 30000.0, 0.0, 1.0};
+
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity ();
 	gluPerspective(100.0,1.0,0.1,6000);
@@ -662,8 +856,8 @@ void modelingMode(void)
 	glLoadIdentity();
 	//isometric/perspective view
 	gluLookAt(3000.0/cam_zoom, 3000.0/cam_zoom, 3000.0/cam_zoom, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-	GLfloat lightPos[] = {0.0, 30000.0, 0.0, 1.0};
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+	glLightfv(GL_LIGHT0, GL_POSITION, theSunPos);
+	glLightfv(GL_LIGHT4, GL_POSITION, spotPos);
 	glViewport(0, 0, 1000, 1000);
 
 	drawShip();
@@ -682,8 +876,6 @@ void idle(void)
 		ResetTimer = ResetTimer + (1.0/60.0) * CLOCKS_PER_SEC;
 				
 		glutPostRedisplay();
-
-		printf("y_rot: %.2f, z_rot: %.2f\n", y_rot, z_rot);
 	}
 
 	if(mousePressed == 1)
@@ -727,9 +919,17 @@ int main (int argc, char** argv)
 	init();
 
 	//make the menu
+
+	int lights = glutCreateMenu(LightOptions);
+	glutAddMenuEntry("Sun", 1);
+	glutAddMenuEntry("Satellite", 2);
+	glutAddMenuEntry("Torus", 3);
+	glutAddMenuEntry("Spotlight", 4);
+
 	int menu = glutCreateMenu(mainMenu);
 	glutAddMenuEntry("Reset", 1);
-	glutAddMenuEntry("Exit", 2);
+	glutAddSubMenu("Lights", lights);
+	glutAddMenuEntry("Exit", 3);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 	glutDisplayFunc (display);

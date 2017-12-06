@@ -45,6 +45,7 @@ GLUquadricObj* quad;
 
 GLuint thrusterFrontTex;
 GLuint hexagonTex;
+GLuint fuselageTex;
 
 /*****************************************************************
 *                               init                             *
@@ -386,7 +387,15 @@ void drawHexagonThing()
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, chrome[0]);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, chrome[1]);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, chrome[2]);
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 80.0);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 500.0);
+
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glBindTexture(GL_TEXTURE_2D, hexagonTex);
+	glEnable(GL_TEXTURE_2D);
 
 	glColor3f(0.0,0.0,0.0);
 
@@ -403,33 +412,45 @@ void drawHexagonThing()
 	//draw the outer faces
 	glBegin(GL_QUAD_STRIP);
 		//1
+		glTexCoord2f(0.25, 0.0);
 		glNormal3f(0.0, .5, 0.0);
 		glVertex3f(baseWidth/2.0,verticalOffset,0.0);
+		glTexCoord2f(0.25, 1.0);
 		glNormal3f(0.0, .5, 0.0);
 		glVertex3f(baseWidth/2.0,verticalOffset,depth);
 		//2
+		glTexCoord2f(0.0, 0.0);
 		glNormal3f(-.5, 0.0, 0.0);
 		glVertex3f(middleWidth/2.0,height*.7+verticalOffset,0.0);
+		glTexCoord2f(0.0, 1.0);
 		glNormal3f(-.5, 0.0, 0.0);
 		glVertex3f(middleWidth/2.0,height*.7+verticalOffset,depth);
 		//3
+		glTexCoord2f(0.25, 0.0);
 		glNormal3f(0.0, -.5, 0.0);
 		glVertex3f(topWidth/2.0,height+verticalOffset,0.0);
+		glTexCoord2f(0.25, 1.0);
 		glNormal3f(0.0, -.5, 0.0);
 		glVertex3f(topWidth/2.0,height+verticalOffset,depth);
 		//4
+		glTexCoord2f(0.0, 0.0);
 		glNormal3f(0.0, -.5, 0.0);
 		glVertex3f(-topWidth/2.0,height+verticalOffset,0.0);
+		glTexCoord2f(0.0, 1.0);
 		glNormal3f(0.0, -.5, 0.0);
 		glVertex3f(-topWidth/2.0,height+verticalOffset,depth);
 		//5
+		glTexCoord2f(0.25, 0.0);
 		glNormal3f(.5, 0.0, 0.0);
 		glVertex3f(-middleWidth/2.0,height*.7+verticalOffset,0.0);
+		glTexCoord2f(0.25, 1.0);
 		glNormal3f(.5, 0.0, 0.0);
 		glVertex3f(-middleWidth/2.0,height*.7+verticalOffset,depth);
 		//6
+		glTexCoord2f(0.0, 0.0);
 		glNormal3f(.5, .5, 0.0);
 		glVertex3f(-baseWidth/2.0,verticalOffset,0.0);
+		glTexCoord2f(0.0, 1.0);
 		glNormal3f(.5, .5, 0.0);
 		glVertex3f(-baseWidth/2.0,verticalOffset,depth);
 		//1
@@ -442,21 +463,27 @@ void drawHexagonThing()
 	//draw the front face
 	glBegin(GL_POLYGON);
 		//1
+		glTexCoord2f(0.6, 0.0);
 		glNormal3f(0.0, 0.0, 1.0);
 		glVertex3f(baseWidth/2.0,verticalOffset,0.0);
 		//2
+		glTexCoord2f(0.8, 0.4);
 		glNormal3f(0.0, 0.0, 1.0);
 		glVertex3f(middleWidth/2.0,height*.7+verticalOffset,0.0);
 		//3
+		glTexCoord2f(0.7, 0.3);
 		glNormal3f(0.0, 0.0, 1.0);
 		glVertex3f(topWidth/2.0,height+verticalOffset,0.0);
 		//4
+		glTexCoord2f(0.3, 0.3);
 		glNormal3f(0.0, 0.0, 1.0);
 		glVertex3f(-topWidth/2.0,height+verticalOffset,0.0);
 		//5
+		glTexCoord2f(0.2, 0.4);
 		glNormal3f(0.0, 0.0, 1.0);
 		glVertex3f(-middleWidth/2.0,height*.7+verticalOffset,0.0);
 		//6
+		glTexCoord2f(0.4, 0.0);
 		glNormal3f(0.0, 0.0, 1.0);
 		glVertex3f(-baseWidth/2.0,verticalOffset,0.0);
 	glEnd();
@@ -464,24 +491,32 @@ void drawHexagonThing()
 	//draw the rear face
 	glBegin(GL_POLYGON);
 		//1
+		glTexCoord2f(0.6, 0.0);
 		glNormal3f(0.0, 0.0, 1.0);
 		glVertex3f(baseWidth/2.0,verticalOffset,depth);
 		//2
+		glTexCoord2f(0.8, 0.4);
 		glNormal3f(0.0, 0.0, 1.0);
 		glVertex3f(middleWidth/2.0,height*.7+verticalOffset,depth);
 		//3
+		glTexCoord2f(0.7, 0.3);
 		glNormal3f(0.0, 0.0, 1.0);
 		glVertex3f(topWidth/2.0,height+verticalOffset,depth);
 		//4
+		glTexCoord2f(0.3, 0.3);
 		glNormal3f(0.0, 0.0, 1.0);
 		glVertex3f(-topWidth/2.0,height+verticalOffset,depth);
 		//5
+		glTexCoord2f(0.2, 0.4);
 		glNormal3f(0.0, 0.0, 1.0);
 		glVertex3f(-middleWidth/2.0,height*.7+verticalOffset,depth);
 		//6
+		glTexCoord2f(0.4, 0.0);
 		glNormal3f(0.0, 0.0, 1.0);
 		glVertex3f(-baseWidth/2.0,verticalOffset,depth);
 	glEnd();
+	
+	glDisable(GL_TEXTURE_2D);
 }
 
 /*****************************************************************
@@ -674,16 +709,14 @@ void drawThruster(void)
 			glutSolidTorus(8.0, 125.0, 6.0, 60.0);
 			glEnable(GL_TEXTURE_2D);
 			gluCylinder(quad, 120.0, 20.0, 50.0, 30.0, 10.0);
-			glEnable(GL_TEXTURE_2D);
+			glDisable(GL_TEXTURE_2D);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, gold[0]);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, gold[1]);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, gold[2]);
 			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 51.2);
 			glTranslatef(0.0, 0.0, -20.0);
-			glEnable(GL_TEXTURE_2D);
 			gluCylinder(quad, 121.0, 121.0, 20.0, 30.0, 8.0);
 		glPopMatrix();
-		glDisable(GL_TEXTURE_2D);
 
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -799,20 +832,34 @@ void drawCentrifuge(void)
 //Purpose: Draws the body of the ship
 void drawFuselage(void)
 {
+	int i;
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, steel[0]);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, steel[1]);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, steel[2]);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 32.0);
 
-	int i;
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glBindTexture(GL_TEXTURE_2D, fuselageTex);
+	glEnable(GL_TEXTURE_2D);
+
 	glColor3f(0.0,1.0,0.0);
 	glPushMatrix();
 		glTranslatef(0.0, 0.0, 300.0);
-		gluCylinder(quad, 20.0, 20.0, 1870.0, 30.0, 100.0);
-		glTranslatef(0.0,0.0,1870.0);
+		//gluCylinder(quad, 20.0, 20.0, 1870.0, 30.0, 100.0);
+		for(i = 0; i < 10; i++)
+		{
+			gluCylinder(quad, 20.0, 20.0, 187.0, 30.0, 100.0);
+			glTranslatef(0.0, 0.0, 187.0);
+		}
 		glutSolidCone(20.0, 15.0, 20, 10);
 	glPopMatrix();
+	
+	glDisable(GL_TEXTURE_2D);
 
 	for(i = 0; i < 6; i++)
 	{
@@ -928,9 +975,15 @@ void loadTextures() {
 		exit(1);
 	}
 
-	hexagonTex = SOIL_load_OGL_texture("hexagon.jpg", 4, 0, 0);
+	hexagonTex = SOIL_load_OGL_texture("hex.png", 4, 0, 0);
 	if (!hexagonTex) {
 		printf("***NO BITMAP RETRIEVED hexagonTex***\n");  //Check to see if successfully loaded
+		exit(1);
+	}
+
+	fuselageTex = SOIL_load_OGL_texture("fuselage.png", 4, 0, 0);
+	if (!fuselageTex) {
+		printf("***NO BITMAP RETRIEVED fuselageTex***\n");  //Check to see if successfully loaded
 		exit(1);
 	}
 }
